@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Loja XYZ || Produtos</title>
+        <link rel="stylesheet" href="css/photon.css" />
+        <link rel="stylesheet" href="css/style.css" />
+
+    </head>
+    <body>
+        <div class="window">
+              <header class="toolbar toolbar-header">
+		<h1 class="title">Loja XYZ</h1>
+		 <div class="toolbar-actions">
+			<div class="btn-group">
+			  <a href="index.html" class="btn btn-default">
+				<span class="icon icon-home"></span>
+			  </a>
+			  <!--<button class="btn btn-default">
+				<span class="icon icon-folder"></span>
+			  </button>
+			  <button class="btn btn-default active">
+				<span class="icon icon-cloud"></span>
+			  </button>
+			  <button class="btn btn-default">
+				<span class="icon icon-popup"></span>
+			  </button>
+			  <button class="btn btn-default">
+				<span class="icon icon-shuffle"></span>
+			  </button>-->
+			</div>
+
+			<!--<button class="btn btn-default">
+			  <span class="icon icon-home icon-text"></span>
+			  Filters
+			</button>
+
+			<button class="btn btn-default btn-dropdown pull-right">
+			  <span class="icon icon-megaphone"></span>
+			</button>-->
+	  </div>
+
+	  </header>
+              <div class="window-content">
+                <div class="pane-group">
+                 <div class="pane-sm sidebar">
+		  <nav class="nav-group">
+  <h5 class="nav-group-title">Menu</h5>
+  <a href="produtos.html" class="nav-group-item active">
+    <span class="icon icon-layout"></span>
+    Produtos
+  </a>
+  <a href="clientes.html" class="nav-group-item ">
+    <span class="icon icon-users"></span>
+    Clientes
+  </a>
+  <a href="vendas.html" class="nav-group-item">
+    <span class="icon icon-check"></span>
+    Vendas
+  </a>
+  <a href="fornecedor.html" class="nav-group-item">
+    <span class="icon icon-user"></span>
+    Fornecedor
+  </a>
+
+</nav></div>
+                  <div class="pane">
+                  <div class="pull-right"><button type="button" @click="createProduct()" class="btn btn-primary">Cadastrar Produto</button></div>
+                 <!--  <a href="index.html" class="btn btn-primary">Clientes</a>
+         <a href="produtos.html" class="btn btn-primary">Produtos</a>
+         <a href="vendas.html" class="btn btn-primary">Vendas</a> -->
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Nome</th>
+                        <th>Preço</th>
+                        <th>Qtd</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tboady>
+                      <tr v-for="produto in produtos">
+                        <td>{{produto.nome}}</td>
+                        <td>{{produto.preco  | currency 'R$'}}</td>
+                        <td>{{produto.qtd}}</td>
+                        <td><button type="button" class="btn btn-warning" @click="editProduct(produto)">Editar</button></td>
+                      </tr>
+                    </tboady>
+                  </table>
+                  </div>
+                </div>
+              </div>
+              <footer class="toolbar toolbar-footer">
+                <h1 class="title">Desenvolvido por AntunesWeb</h1>
+              </footer>
+
+            </div>
+            <!--ABERTURA DO MODAL DE EDIÇÃO-->
+            <div id="modal" v-if="openModal">
+              <div class="wrap">
+                <form action="" class="pane-body" id="cadastro-cliente">
+                  <legend ><h3 v-if="mode=='cadastro'">Cadastro de Produto</h3>
+                  <h3 v-if="mode=='edicao'">Editar Produto</h3></legend>
+                  <div class="form-group">
+                    <input type="text" class="form-control" v-model="product.nome" id="nome" placeholder="Nome">
+                  </div>
+                  <div class="form-group">
+                    <input type="text" class="form-control money" v-model="product.preco"  id="preco" placeholder="Preço">
+                  </div>
+                  <div class="form-group">
+                    <input type="text" class="form-control" v-model="product.qtd"  id="qtd" placeholder="Quantidade">
+                  </div>
+                  <div class="form-group text-right">
+                    <button type="button" class="btn btn-negative" @click="openModal=False" id="cancelar">Cancelar</button>
+                    <button type="button" class="btn btn-positive" @click="productStoreOrUpdate" id="salvar">Salvar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+    </body>
+    <script>
+
+        var read = require('read-file-utf8');
+        var loki = require('lokijs');
+        var db = new loki('db.json');
+        var data = read(__dirname+'/db.json');
+
+        db.loadJSON(data);
+
+        window.Vue = require('vue/dist/vue.js');
+        //console.log(db);
+        //var produtos = db.addCollection('produtos');
+        var produtos = db.getCollection('produtos');
+       // db.save();
+        console.log(db);
+        new Vue({
+          el: 'body',
+          data: {
+              mode:'',
+              openModal:false,
+              produtos: [],
+              product:{
+                  nome:'',
+                  preco:'',
+                  qdt: 0
+              }
+          },
+            ready: function(){
+                this.produtos = produtos.data;
+                //console.log(this.produtos);
+            },
+            methods:{
+                editProduct: function(product){
+                    this.mode='edicao';
+                    this.openModal = true;
+                    this.product=product;
+
+                },
+                createProduct: function(){
+                    this.mode='cadastro';
+                    this.openModal = true;
+                    this.product = {
+                        nome:'',
+                        preco:'',
+                        qtd:''
+                    }
+
+                },
+                productStoreOrUpdate: function(){
+                    if(typeof this.product.$loki != 'undefined'){
+                        produtos.update(this.product)
+                    }else{
+                        produtos.insert(this.product);
+                    }
+                    db.save();
+                    this.openModal=false;
+                }
+            }
+        });
+
+    </script>
+</html>

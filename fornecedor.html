@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>LojaXYZ || Fornecedores</title>
+	<meta charset="utf-8" />
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/photon.css" />
+    <link rel="stylesheet" href="css/style.css" />
+
+    <!-- Electron Javascript -->
+    <!--<script src="app.js" charset="utf-8"></script>-->
+  </head>
+
+  <body>
+    <!-- Wrap your entire app inside .window -->
+
+	<div class="window">
+
+	 <header class="toolbar toolbar-header">
+		<h1 class="title">Loja XYZ</h1>
+		 <div class="toolbar-actions">
+			<div class="btn-group">
+			  <a href="index.html" class="btn btn-default">
+				<span class="icon icon-home"></span>
+			  </a>
+			  <!--<button class="btn btn-default">
+				<span class="icon icon-folder"></span>
+			  </button>
+			  <button class="btn btn-default active">
+				<span class="icon icon-cloud"></span>
+			  </button>
+			  <button class="btn btn-default">
+				<span class="icon icon-popup"></span>
+			  </button>
+			  <button class="btn btn-default">
+				<span class="icon icon-shuffle"></span>
+			  </button>-->
+			</div>
+
+			<!--<button class="btn btn-default">
+			  <span class="icon icon-home icon-text"></span>
+			  Filters
+			</button>
+
+			<button class="btn btn-default btn-dropdown pull-right">
+			  <span class="icon icon-megaphone"></span>
+			</button>-->
+	  </div>
+
+	  </header>
+	  <div class="window-content">
+		<div class="pane-group">
+	  <div class="pane-sm sidebar">
+		  <nav class="nav-group">
+  <h5 class="nav-group-title">Menu</h5>
+  <a href="produtos.html" class="nav-group-item ">
+    <span class="icon icon-layout"></span>
+    Produtos
+  </a>
+  <a href="clientes.html" class="nav-group-item ">
+    <span class="icon icon-users"></span>
+    Clientes
+  </a>
+  <a href="vendas.html" class="nav-group-item">
+    <span class="icon icon-check"></span>
+    Vendas
+  </a>
+  <a href="vendas.html" class="nav-group-item active">
+    <span class="icon icon-user"></span>
+    Fornecedor
+  </a>
+
+</nav></div>
+		  <div class="pane">
+            <div class="pull-right">
+             <button type="button" @click="createProvider()" class="btn btn-primary">Cadastrar Fornecedor</button>
+             </div>
+        <!--  <a href="index.html" class="btn btn-primary">Clientes</a>
+         <a href="produtos.html" class="btn btn-primary">Produtos</a>
+         <a href="vendas.html" class="btn btn-primary">Vendas</a> -->
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>CNPJ/CPF</th>
+                <th>Razão</th>
+                <th>Endereço</th>
+                <th>Telefone</th>
+                <th>Site</th>
+                <th>Tipo de Produtos</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tboady>
+              <tr v-for="cliente in clientes">
+                <td>{{fornecedor.nome}}</td>
+                <td>{{fornecedor.cnpj}}</td>
+                <td>{{fornecedor.razao}}</td>
+                <td>{{fornecedor.endereco}}</td>
+                <td>{{fornecedor.telefone}}</td>
+                <td>{{fornecedor.site}}</td>
+                <td>{{fornecedor.tipoProduto}}</td>
+                <td><button type="button" class="btn btn-warning" @click="editProvider(fornecedor)">Editar</button></td>
+              </tr>
+            </tboady>
+          </table>
+		  </div>
+		</div>
+	  </div>
+	  <footer class="toolbar toolbar-footer">
+		<h1 class="title">Desenvolvido por AntunesWeb</h1>
+	  </footer>
+
+</div>
+<!--ABERTURA DO MODAL DE EDIÇÃO-->
+<div id="modal" v-if="openModal">
+  <div class="wrap">
+    <form action="" class="pane-body" id="cadastro-cliente">
+      <legend ><h3 v-if="mode=='cadastro'">Cadastrar Fornecedor</h3>
+      <h3 v-if="mode=='edicao'">Editar Fornecedor</h3></legend>
+      <div class="form-group">
+        <input type="text" class="form-control" v-model="provider.nome" id="nome" placeholder="Nome">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" v-model="provider.cnpj"  id="cpf" placeholder="CNPJ/CPF">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" v-model="provider.razao"  id="razao" placeholder="Razão">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" v-model="provider.endereco"  id="endereco" placeholder="Endereço">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" v-model="provider.telefone"  id="telefone" placeholder="Telefone">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" v-model="provider.site"  id="site" placeholder="Site">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" v-model="provider.tipoProduto"  id="tipoProduto" placeholder="Tipo Produto">
+      </div>
+      <div class="form-group text-right">
+        <button type="button" class="btn btn-negative" @click="openModal=False" id="cancelar">Cancelar</button>
+        <button type="button" class="btn btn-positive" @click="providerStoreOrUpdate" id="salvar">Salvar</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+ <!--FECHAMENTO DO MODAL DE EDIÇÃO-->
+  </body>
+
+  <script>
+  var read = require('read-file-utf8');
+  var loki = require('lokijs');
+  var db = new loki('db.json');
+  var data = read(__dirname+'/db.json');
+
+  db.loadJSON(data);
+
+  window.Vue = require('vue/dist/vue.js');
+  //console.log(db);
+
+
+    var fornecedor = db.getCollection('fornecedor');
+    console.log(db);
+    new Vue({
+      el: 'body',
+      data: {
+        fornecedor: [],
+          mode:'',
+          provider:{
+              nome:'',
+              cnpj:'',
+              razao:'',
+              endereco:'',
+              telefone:'',
+              site:'',
+              tipoProduto:''
+          },
+        openModal: false
+      },
+      ready: function(){
+        this.fornecedor = fornecedor.data;
+        console.log(fornecedor.data);
+      },
+        methods:{
+            editProvider: function(provider){
+                this.mode='edicao';
+                this.openModal = true;
+                this.provider=provider;
+
+            },
+            createProvider: function(){
+                this.mode='cadastro';
+                this.openModal = true;
+                this.provider = {
+                  nome:'',
+                  cnpj:'',
+                  razao:'',
+                  endereco:'',
+                  telefone:'',
+                  site:'',
+                  tipoProduto:''
+                }
+
+            },
+            providerStoreOrUpdate: function(){
+                if(typeof this.provider.$loki != 'undefined'){
+                    fornecedor.update(this.provider);
+                }else{
+                    fornecedor.insert(this.provider);
+                }
+                db.save();
+                this.openModal=false;
+            }
+        }
+    });
+
+  </script>
+</html>
