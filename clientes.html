@@ -91,7 +91,7 @@
               <tr v-for="cliente in clientes">
                 <td>{{cliente.nome}}</td>
                 <td>{{cliente.cpf}}</td>
-                <td>{{cliente.telefone | phone}}</td>
+                <td>{{cliente.telefone}}</td>
                 <td><button type="button" class="btn btn-warning" @click="editClient(cliente)">Editar</button></td>
               </tr>
             </tboady>
@@ -131,23 +131,15 @@
   </body>
 
   <script>
-     var read = require('read-file-utf8');
-        var loki = require('lokijs');
-        var db = new loki('db.json');
-        var fileExists = require('file-exists');
-        var data={};
-        if(fileExists(__dirname+'/db.json')){
-            data = read(__dirname+'/db.json');
-            db.loadJSON(data);
-        }else{
-             db.addCollection('vendas');
-            db.addCollection('clientes');
-            db.addCollection('produtos');
-            db.save();
-        }
+  var read = require('read-file-utf8');
+  var loki = require('lokijs');
+  var db = new loki('db.json');
+  var data = read(__dirname+'/db.json');
 
-    window.Vue = require('vue/dist/vue.js');
-    //console.log(db);
+  db.loadJSON(data);
+
+  window.Vue = require('vue/dist/vue.js');
+  //console.log(db);
 
 
     var clientes = db.getCollection('clientes');
