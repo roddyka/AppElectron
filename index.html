@@ -6,7 +6,7 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/photon.css" />
     <link rel="stylesheet" href="css/style.css" />
-
+    <link href="responsive-calendar/0.9/css/responsive-calendar.css" rel="stylesheet" media="screen">
     <!-- Electron Javascript -->
     <!--<script src="app.js" charset="utf-8"></script>-->
   </head>
@@ -75,11 +75,35 @@
   </a>
 </nav></div>
 		  <div class="pane">
-              <div class="text-center">
+        <div class="text-center">
+
+          <!--CALENDARIO INICIO-->
+          <div class="responsive-calendar">
+  <div class="controls">
+      <a class="pull-left" data-go="prev"><div class="btn btn-positive"><i class="icon icon-left"></i></div></a>
+      <h4><span data-head-year></span> <span data-head-month></span></h4>
+      <a class="pull-right" data-go="next"><div class="btn btn-positive"><i class="icon icon-right"></i></div></a>
+  </div><hr/>
+  <div class="day-headers">
+    <div class="day header">Segunda</div>
+    <div class="day header">Terça</div>
+    <div class="day header">Quarta</div>
+    <div class="day header">Quinta</div>
+    <div class="day header">Sexta</div>
+    <div class="day header">Sabado</div>
+    <div class="day header">Domingo</div>
+  </div>
+  <div class="days" data-group="days">
+    <!-- the place where days will be generated -->
+  </div>
+</div>
+<!-- Responsive calendar - END -->
+        </div>
+            <!--  <div class="text-center">
                   <h4>Cad+</h4>
                   <p>Sistema de cadastro de vendas</p>
                    <img src="http://www.fambras.com.br/nova/images/lista_produtos_1_zps6b52c375.png" alt="">
-               </div>
+               </div> -->
 		  </div>
 		</div>
 	  </div>
@@ -92,7 +116,31 @@
 
  <!--FECHAMENTO DO MODAL DE EDIÇÃO-->
   </body>
+  <script src="responsive-calendar/0.9/js/jquery.js"></script>
+  <script src="responsive-calendar/0.9/js/responsive-calendar.js"></script>
+  <script>
+  $( document ).ready( function() {
+    $('.responsive-calendar').responsiveCalendar({
+      translateMonths: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "junho", "Jullho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
+      onMonthChange: function () { //Quando o mês(botão de PREV for clidado) mudado.
+                        var mescorrente = $(this)[0].currentMonth + 1; //Variavel reagata mes corrente do calendario soma mais um ao mes para dezembro ser 12 e não 11.
+                        var anocorrente = $(this)[0].currentYear; //Variavel reagata ano corrente do calendario
+                        var dataCalendario = new Date(mescorrente + "/" + "01" + "/" + anocorrente); //Variavel onde cria uma nova data juntando mes do calendario, mais o primeiro dia e o ano do calendario.
+                        var data = new Date(); //Variavel criando uma nova data
+                        var newData = new Date(data.getTime() - 7948800000); //Variavel onde pega o tempo real( data e mes e ano) e diminui 3 meses em milisegundos
 
+                        if (dataCalendario < newData) { //se a data do calendario for menor que a data real
+                            $("#voltar").hide(); //esconde o botao de previous
+                        } else { //senao
+                            $("#voltar").show(); //volta com o botão
+                        }
+                    },
+                    events: {
+                      "2017-02-01": {"number": 1, "badgeClass": "badge-warning", "url": "http://w3widgets.com"}
+                    }
+    });
+  });
+  </script>
   <script>
        var read = require('read-file-utf8');
         var loki = require('lokijs');
