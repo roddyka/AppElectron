@@ -74,36 +74,68 @@
     Compras
   </a>
 </nav></div>
-		  <div class="pane">
+
+		  <!--div class="pane"> <div class="text-center">
+                  <h4>Cad+</h4>
+                  <p>Sistema de cadastro de vendas</p>
+                   <img src="http://www.fambras.com.br/nova/images/lista_produtos_1_zps6b52c375.png" alt="">
+               </div>
+       </div-->
+           <div class="pane">
+             <ul class="list-group" >
+                <li class="list-group-header">
+                  <input class="form-control" type="text" placeholder="Search for someone">
+                </li>
+                <li class="list-group-item">
+                  <img class="img-circle media-object pull-left" src="images/clientes.jpg" width="32" height="32">
+                  <div class="media-body">
+                    <strong>Clientes</strong>
+                    <p>Lorem ipsum dolor sit amet.</p>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <img class="img-circle media-object pull-left" src="images/produtos.png" width="32" height="32">
+                  <div class="media-body">
+                    <strong>Produtos</strong>
+                    <p>Lorem ipsum dolor sit amet.</p>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <img class="img-circle media-object pull-left" src="images/vendas.png" width="32" height="32">
+                  <div class="media-body">
+                    <strong>Vendas</strong>
+                    <p>Lorem ipsum dolor sit amet.</p>
+                  </div>
+                </li>
+              </ul>
+           </div>
+            <div class="pane">
         <div class="text-center">
 
           <!--CALENDARIO INICIO-->
           <div class="responsive-calendar">
-  <div class="controls">
-      <a class="pull-left" data-go="prev"><div class="btn btn-positive"><i class="icon icon-left"></i></div></a>
-      <h4><span data-head-year></span> <span data-head-month></span></h4>
-      <a class="pull-right" data-go="next"><div class="btn btn-positive"><i class="icon icon-right"></i></div></a>
-  </div><hr/>
-  <div class="day-headers">
-    <div class="day header">Segunda</div>
-    <div class="day header">Terça</div>
-    <div class="day header">Quarta</div>
-    <div class="day header">Quinta</div>
-    <div class="day header">Sexta</div>
-    <div class="day header">Sabado</div>
-    <div class="day header">Domingo</div>
-  </div>
-  <div class="days" data-group="days">
-    <!-- the place where days will be generated -->
-  </div>
-</div>
+            <div class="controls">
+                <a class="pull-left" data-go="prev"><div class="btn btn-positive"><i class="icon icon-left"></i></div></a>
+                <h4><span data-head-year></span> <span data-head-month></span></h4>
+                <a class="pull-right" data-go="next"><div class="btn btn-positive"><i class="icon icon-right"></i></div></a>
+            </div>
+            <hr/>
+            <div class="day-headers">
+              <div class="day header">Segunda</div>
+              <div class="day header">Terça</div>
+              <div class="day header">Quarta</div>
+              <div class="day header">Quinta</div>
+              <div class="day header">Sexta</div>
+              <div class="day header">Sabado</div>
+              <div class="day header">Domingo</div>
+            </div>
+            <div class="days" data-group="days">
+              <!-- the place where days will be generated -->
+            </div>
+          </div>
 <!-- Responsive calendar - END -->
         </div>
-            <!--  <div class="text-center">
-                  <h4>Cad+</h4>
-                  <p>Sistema de cadastro de vendas</p>
-                   <img src="http://www.fambras.com.br/nova/images/lista_produtos_1_zps6b52c375.png" alt="">
-               </div> -->
+
 		  </div>
 		</div>
 	  </div>
@@ -135,7 +167,7 @@
                             $("#voltar").show(); //volta com o botão
                         }
                     },
-                    events: {
+                    events:{
                       "2017-02-01": {"number": 1, "badgeClass": "badge-warning", "url": "http://w3widgets.com"}
                     }
     });
@@ -161,7 +193,8 @@
 
     window.Vue = require('vue/dist/vue.js');
     //console.log(db);
-
+    var vendas = db.getCollection('vendas');
+    var produtos = db.getCollection('produtos');
 
     var clientes = db.getCollection('clientes');
     console.log(db);
@@ -179,6 +212,8 @@
       },
       ready: function(){
         this.clientes = clientes.data;
+        this.vendas = vendas.data;
+        this.produtos = produtos.data;
         console.log(clientes.data);
       },
         methods:{

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Loja XYZ || Compras</title>
+        <link rel="stylesheet" href="css/photon.css" />
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
+    <body>
+        <div class="window">
+              <header class="toolbar toolbar-header">
+		<h1 class="title">Loja XYZ</h1>
+		 <div class="toolbar-actions">
+			<div class="btn-group">
+			  <a href="index.html" class="btn btn-default">
+				<span class="icon icon-home"></span>
+			  </a>
+			  <!--<button class="btn btn-default">
+				<span class="icon icon-folder"></span>
+			  </button>
+			  <button class="btn btn-default active">
+				<span class="icon icon-cloud"></span>
+			  </button>
+			  <button class="btn btn-default">
+				<span class="icon icon-popup"></span>
+			  </button>
+			  <button class="btn btn-default">
+				<span class="icon icon-shuffle"></span>
+			  </button>-->
+			</div>
+
+			<!--<button class="btn btn-default">
+			  <span class="icon icon-home icon-text"></span>
+			  Filters
+			</button>
+
+			<button class="btn btn-default btn-dropdown pull-right">
+			  <span class="icon icon-megaphone"></span>
+			</button>-->
+	  </div>
+
+	  </header>
+              <div class="window-content">
+                <div class="pane-group">
+             <div class="pane-sm sidebar">
+		  <nav class="nav-group">
+  <h5 class="nav-group-title">Menu</h5>
+  <a href="produtos.html" class="nav-group-item ">
+    <span class="icon icon-layout"></span>
+    Produtos
+  </a>
+  <a href="clientes.html" class="nav-group-item ">
+    <span class="icon icon-users"></span>
+    Clientes
+  </a>
+  <a href="vendas.html" class="nav-group-item ">
+    <span class="icon icon-check"></span>
+    Vendas
+  </a>
+  <a href="fornecedor.html" class="nav-group-item">
+    <span class="icon icon-user"></span>
+    Fornecedor
+  </a>
+  <a href="compras.html" class="nav-group-item active">
+    <span class="icon icon-bag"></span>
+    Compras
+  </a>
+
+</nav></div>
+                  <div class="pane">
+                 <div class="pull-right"><button type="button" @click="createShop()" class="btn btn-primary">Cadastro de Compras</button></div>
+                 <!--  <a href="index.html" class="btn btn-primary">Clientes</a>
+         <a href="produtos.html" class="btn btn-primary">Produtos</a>
+         <a href="vendas.html" class="btn btn-primary">Vendas</a> -->
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Fornecedor</th>
+                        <th>Produto</th>
+                        <th>Preço Un.</th>
+                        <th>Qtd</th>
+                        <th>Total</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tboady>
+                      <tr v-for="compra in compras">
+                        <td>{{compra.fornecedor}}</td>
+                        <td>{{compra.produto}}</td>
+                        <td>{{compra.preco | currency 'R$'}}</td>
+                        <td>{{compra.qtd}}</td>
+                        <td>{{compra.qtd*compra.preco | currency 'R$'}}</td>
+                        <td>
+                          <button type="button" class="btn btn-warning" @click="editShop(compras)">Editar</button>
+                          <!--button type="button" class="btn btn-positive" @click="boughtShop(compras)">Comprado</button-->
+                        </td>
+                      </tr>
+                    </tboady>
+                  </table>
+                  </div>
+                </div>
+              </div>
+              <footer class="toolbar toolbar-footer">
+                <h1 class="title">Desenvolvido por AntunesWeb</h1>
+              </footer>
+
+            </div>
+            <!--ABERTURA DO MODAL DE EDIÇÃO-->
+            <div id="modal" v-if="openModal">
+              <div class="wrap">
+                <form action="" class="pane-body" id="cadastro-compras">
+                  <legend ><h3 v-if="mode=='cadastro'">Cadastro de Compras</h3>
+                  <h3 v-if="mode=='edicao'">Editar Compras</h3></legend>
+                  <div class="form-group">
+                   <select class="form-control" name="" id="" v-model="shop.fornecedor">
+                       <option value="{{f.nome}}" v-for="f in fornecedor">{{f.nome}}</option>
+                   </select>
+                  </div>
+                  <div class="form-group">
+                    <select class="form-control" name="" id="" v-model="shop.produto">
+                        <option value="{{p.nome}}" v-for="p in produtos">{{p.nome}}</option>
+                    </select>
+                  </div>
+                   <div class="form-group" v-if="mode=='edicao'">
+                    <input type="text" class="form-control" v-model="shop.preco"  id="qtd" placeholder="Preço">
+                  </div>
+                  <div class="form-group">
+                    <input type="text" class="form-control" v-model="shop.qtd"  id="qtd" placeholder="Quantidade">
+                  </div>
+                  <div class="form-group text-right">
+                    <button type="button" class="btn btn-negative" @click="openModal=False" id="cancelar">Cancelar</button>
+                    <button type="button" class="btn btn-positive" @click="shopStoreOrUpdate" id="salvar">Salvar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+    </body>
+    <script>
+        var read = require('read-file-utf8');
+        var loki = require('lokijs');
+        var db = new loki('db.json');
+        var data = read(__dirname+'/db.json');
+
+        db.loadJSON(data);
+
+        window.Vue = require('vue/dist/vue.js');
+        //console.log(db);
+        var compras = db.getCollection('compras');
+        var fornecedor = db.getCollection('fornecedor');
+        var produtos = db.getCollection('produtos');
+
+        console.log(db);
+        new Vue({
+          el: 'body',
+          data: {
+              mode:'',
+              openModal:false,
+                  compras: [],
+                  fornecedor: [],
+                  produtos: [],
+              shop:{
+                  fornecedor:'',
+                  produto:'',
+                  preco:'',
+                  qdt: 1
+              }
+          },
+            ready: function(){
+                console.log(this.fornecedor);
+                this.produtos = produtos.data;
+                this.compras = compras.data;
+                this.fornecedor = fornecedor.data;
+            },
+            methods:{
+                editShop: function(shop){
+                    this.mode='edicao';
+                    this.openModal = true;
+                    this.shop=shop;
+
+                },
+                createShop: function(){
+                    this.mode='cadastro';
+                    this.openModal = true;
+                    this.shop = {
+                      fornecedor:'',
+                      produto:'',
+                      preco:0,
+                      qdt: 1
+                    }
+
+                },
+                /**boughtShop: function(shop){
+                  this.mode='edicao';
+                  this.openModal = true;
+                  this.shop=shop;
+                },**/
+                shopStoreOrUpdate: function(){
+                    if(typeof this.shop.$loki != 'undefined'){
+                        compras.update(this.shop);
+                    }else{
+                        //console.log(produtos.find({nome:this.sale.produto})[0].preco);
+                        this.shop.preco = produtos.find({nome:this.shop.produto})[0].preco;
+                        compras.insert(this.shop);
+                    }
+                    db.save();
+                    this.openModal=false;
+                }
+            }
+        });
+    </script>
+</html>
