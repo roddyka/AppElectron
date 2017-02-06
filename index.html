@@ -73,6 +73,10 @@
     <span class="icon icon-bag"></span>
     Compras
   </a>
+  <a href="compras.html" class="nav-group-item">
+    <span class="icon icon-menu"></span>
+    Estoque
+  </a>
 </nav></div>
 
 		  <!--div class="pane"> <div class="text-center">
@@ -188,6 +192,7 @@
             db.addCollection('produtos');
             db.addCollection('fornecedor');
             db.addCollection('compras');
+            db.addCollection('estoque');
             db.save();
         }
 

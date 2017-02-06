@@ -2,9 +2,10 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Loja XYZ || Produtos</title>
+        <title>Loja XYZ || Estoque</title>
         <link rel="stylesheet" href="css/photon.css" />
         <link rel="stylesheet" href="css/style.css" />
+
     </head>
     <body>
         <div class="window">
@@ -42,7 +43,7 @@
 	  </header>
               <div class="window-content">
                 <div class="pane-group">
-             <div class="pane-sm sidebar">
+                 <div class="pane-sm sidebar">
 		  <nav class="nav-group">
   <h5 class="nav-group-title">Menu</h5>
   <a href="produtos.html" class="nav-group-item ">
@@ -53,7 +54,7 @@
     <span class="icon icon-users"></span>
     Clientes
   </a>
-  <a href="vendas.html" class="nav-group-item active">
+  <a href="vendas.html" class="nav-group-item">
     <span class="icon icon-check"></span>
     Vendas
   </a>
@@ -65,38 +66,37 @@
     <span class="icon icon-bag"></span>
     Compras
   </a>
-  <a href="estoque.html" class="nav-group-item">
+  <a href="estoque.html" class="nav-group-item active">
     <span class="icon icon-menu"></span>
     Estoque
   </a>
+
 </nav></div>
                   <div class="pane">
-                 <div class="pull-right"><button type="button" @click="createSale()" class="btn btn-primary">Cadastro de Venda</button></div>
+                  <div class="pull-right"><button type="button" @click="createStock()" class="btn btn-primary">Cadastrar Estoque</button></div>
                  <!--  <a href="index.html" class="btn btn-primary">Clientes</a>
          <a href="produtos.html" class="btn btn-primary">Produtos</a>
          <a href="vendas.html" class="btn btn-primary">Vendas</a> -->
-                  <table class="table table-striped">
-                    <thead>
-                      <tr>
-                        <th>Cliente</th>
-                        <th>Produto</th>
-                        <th>Preço Un.</th>
-                        <th>Qtd</th>
-                        <th>Total</th>
-                        <th>Ações</th>
-                      </tr>
-                    </thead>
-                    <tboady>
-                      <tr v-for="venda in vendas">
-                        <td>{{venda.cliente}}</td>
-                        <td>{{venda.produto}}</td>
-                        <td>{{venda.preco | currency 'R$'}}</td>
-                        <td>{{venda.qtd}}</td>
-                        <td>{{venda.qtd*venda.preco | currency 'R$'}}</td>
-                        <td><button type="button" class="btn btn-warning" @click="editSale(venda)">Editar</button></td>
-                      </tr>
-                    </tboady>
-                  </table>
+                     <table class="table table-striped">
+                       <thead>
+                         <tr>
+                           <th>Produto</th>
+                           <th>Preço Un. / de fábrica</th>
+                           <th>Qtd</th>
+                           <th>Ações</th>
+                         </tr>
+                       </thead>
+                       <tboady>
+                         <tr v-for="estoque in estoque">
+                           <td>{{estoque.produto}}</td>
+                           <td>{{estoque.preco | currency 'R$'}}</td>
+                           <td>{{estoque.qtd}}</td>
+                           <td>
+                             <button type="button" class="btn btn-positive" @click="sellStock(produto)">Enviar para Prod. em Venda</button>
+                           </td>
+                         </tr>
+                       </tboady>
+                     </table>
                   </div>
                 </div>
               </div>
@@ -108,34 +108,28 @@
             <!--ABERTURA DO MODAL DE EDIÇÃO-->
             <div id="modal" v-if="openModal">
               <div class="wrap">
-                <form action="" class="pane-body" id="cadastro-venda">
-                  <legend ><h3 v-if="mode=='cadastro'">Cadastro de Venda</h3>
-                  <h3 v-if="mode=='edicao'">Editar Venda</h3></legend>
+                <form action="" class="pane-body" id="cadastro-cliente">
+                  <legend ><h3 v-if="mode=='cadastro'">Cadastro de Produto</h3>
+                  <h3 v-if="mode=='edicao'">Enviar para Produtos</h3></legend>
                   <div class="form-group">
-                   <select class="form-control" name="" id="" v-model="sale.cliente">
-                       <option value="{{c.nome}}" v-for="c in clientes">{{c.nome}}</option>
-                   </select>
+                    <input type="text" class="form-control" v-model="stock.nome" id="nome" placeholder="Nome">
                   </div>
                   <div class="form-group">
-                    <select class="form-control" name="" id="" v-model="sale.produto">
-                        <option value="{{p.nome}}" v-for="p in produtos">{{p.nome}}</option>
-                    </select>
-                  </div>
-                   <div class="form-group" v-if="mode=='edicao'">
-                    <input type="text" class="form-control" v-model="sale.preco"  id="qtd" placeholder="Preço">
+                    <input type="text" class="form-control money" v-model="stock.preco"  id="preco" placeholder="Preço">
                   </div>
                   <div class="form-group">
-                    <input type="text" class="form-control" v-model="sale.qtd"  id="qtd" placeholder="Quantidade">
+                    <input type="text" class="form-control" v-model="stock.qtd"  id="qtd" placeholder="Quantidade">
                   </div>
                   <div class="form-group text-right">
                     <button type="button" class="btn btn-negative" @click="openModal=False" id="cancelar">Cancelar</button>
-                    <button type="button" class="btn btn-positive" @click="saleStoreOrUpdate" id="salvar">Salvar</button>
+                    <button type="button" class="btn btn-positive" @click="stockStoreOrUpdate" id="salvar">Enviar</button>
                   </div>
                 </form>
               </div>
             </div>
     </body>
     <script>
+
         var read = require('read-file-utf8');
         var loki = require('lokijs');
         var db = new loki('db.json');
@@ -145,63 +139,60 @@
 
         window.Vue = require('vue/dist/vue.js');
         //console.log(db);
-
-        var vendas = db.getCollection('vendas');
-        var clientes = db.getCollection('clientes');
-        var produtos = db.getCollection('produtos');
-
+        //var produtos = db.addCollection('produtos');
+        var estoque = db.getCollection('estoque');
+       // db.save();
         console.log(db);
         new Vue({
           el: 'body',
           data: {
               mode:'',
               openModal:false,
-              vendas: [],
-               clientes: [],
-               produtos: [],
-              sale:{
-                  cliente:'',
-                  produto:'',
-                  preco:0,
-                  qdt: 1
+              estoque: [],
+              stock:{
+                  nome:'',
+                  preco:'',
+                  qdt: 0
               }
           },
             ready: function(){
-                this.produtos = produtos.data;
-                this.vendas = vendas.data;
-                this.clientes = clientes.data;
+                this.estoque = estoque.data;
                 //console.log(this.produtos);
             },
             methods:{
-                editSale: function(sale){
+                editStock: function(stock){
                     this.mode='edicao';
                     this.openModal = true;
-                    this.sale=sale;
+                    this.stock=stock;
 
                 },
-                createSale: function(){
+                createStock: function(){
                     this.mode='cadastro';
                     this.openModal = true;
-                    this.sale = {
-                        cliente:'',
-                        produto:'',
-                        preco:0,
-                        qdt: 1
+                    this.stock = {
+                        nome:'',
+                        preco:'',
+                        qtd:''
                     }
 
                 },
-                saleStoreOrUpdate: function(){
-                    if(typeof this.sale.$loki != 'undefined'){
-                        vendas.update(this.sale);
+                sellStock: function(product){
+                    this.mode='edicao';
+                    this.openModal = true;
+                    this.stock=stock;
+
+                },
+                stockStoreOrUpdate: function(){
+                    if(typeof this.stock.$loki != 'undefined'){
+                        estoque.update(this.stock)
                     }else{
-                        //console.log(produtos.find({nome:this.sale.produto})[0].preco);
-                        this.sale.preco = produtos.find({nome:this.sale.produto})[0].preco;
-                        vendas.insert(this.sale);
+                        estoque.insert(this.stock);
                     }
                     db.save();
                     this.openModal=false;
                 }
             }
         });
+
     </script>
 </html>
