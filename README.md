@@ -11,3 +11,5 @@ Aplicação Criada para base de estudos, não deve ser utilizada para fins lucra
  > - 1.4 - Cadastro de Fornecedores - Fornecedores(Onde só é registrado fornecedores para os produtos que estao cadastrados)··
  > - 1.5 - Cadastro de compras - Compras feitas dos fornecedores··
  > - 1.6 - Cadastro de Estoque - Ao finalizar a compra os produtos vão para o estoque.
+
+Projeto paralizado.
